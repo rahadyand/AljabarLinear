@@ -8,6 +8,7 @@ Pemisahan:
 """
 
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -15,6 +16,7 @@ from pydantic import BaseModel, ConfigDict
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 class MahasiswaBase(BaseModel):
     nama_mahasiswa: str
+    nim: Optional[str] = None
 
 
 class MahasiswaCreate(MahasiswaBase):

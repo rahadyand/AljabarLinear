@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
 from app.database import get_db
 from app.models import Mahasiswa, MataKuliah, Nilai
 
@@ -59,6 +60,18 @@ def hitung_pca(db: Session = Depends(get_db)):
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(scaled_data)
 
+    # 5.1. Jalankan KMeans (n_clusters=3)
+    kmeans = KMeans(n_clusters=3, random_state=42)
+    klaster_labels = kmeans.fit_predict(pca_result)
+
+    # 5.2. Hitung Profil Klaster (Rata-rata nilai per mata kuliah untuk setiap klaster)
+    df_klaster = pivot_df.copy()
+    df_klaster['klaster'] = klaster_labels
+    profil_df = df_klaster.groupby('klaster').mean()
+    
+    # Ubah hasil groupby menjadi dictionary dengan format: {"0": {"MK1": 80, ...}, ...}
+    profil_klaster = {str(k): v for k, v in profil_df.to_dict(orient="index").items()}
+
     # 6. Susun Response JSON
     # explained_variance_ratio
     explained_variance_ratio = pca.explained_variance_ratio_.tolist()
@@ -78,11 +91,13 @@ def hitung_pca(db: Session = Depends(get_db)):
             "nama_mahasiswa": meta["nama_mahasiswa"],
             "nim": meta["nim"],
             "PC1": float(pca_result[i, 0]),
-            "PC2": float(pca_result[i, 1])
+            "PC2": float(pca_result[i, 1]),
+            "klaster": int(klaster_labels[i])
         })
 
     return {
         "explained_variance_ratio": explained_variance_ratio,
         "komponen_utama": komponen_utama,
-        "skor_mahasiswa": skor_mahasiswa
+        "skor_mahasiswa": skor_mahasiswa,
+        "profil_klaster": profil_klaster
     }

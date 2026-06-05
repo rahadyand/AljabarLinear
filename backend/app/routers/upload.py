@@ -25,7 +25,7 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
     if "nama mahasiswa" not in df.columns:
         raise HTTPException(status_code=400, detail="Kolom 'Nama Mahasiswa' tidak ditemukan dalam CSV")
     
-    course_cols = [col for col in df.columns if col != "nama mahasiswa"]
+    course_cols = [col for col in df.columns if col not in ["nama mahasiswa", "nim"]]
     
     # Cache dengan menggunakan string lowercase agar pencarian lebih kebal typo huruf besar/kecil
     mahasiswa_cache = {m.nama_mahasiswa.lower(): m for m in db.query(Mahasiswa).all()}
@@ -50,12 +50,28 @@ async def upload_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
         nama_mhs = str(nama_mhs).strip()
         nama_mhs_lower = nama_mhs.lower()
         
+        # Tangani kolom NIM jika ada
+        nim_val = None
+        if "nim" in df.columns:
+            nim_raw = row["nim"]
+            if pd.notna(nim_raw):
+                nim_str = str(nim_raw)
+                # Tangani masalah float misal 12345.0
+                if nim_str.endswith(".0"):
+                    nim_str = nim_str[:-2]
+                nim_val = nim_str.strip()
+        
         # Cek dan simpan nama mahasiswa
         if nama_mhs_lower not in mahasiswa_cache:
-            baru_mhs = Mahasiswa(nama_mahasiswa=nama_mhs) # Simpan dengan format aslinya
+            baru_mhs = Mahasiswa(nama_mahasiswa=nama_mhs, nim=nim_val) # Simpan dengan format aslinya beserta nim
             db.add(baru_mhs)
             db.flush()
             mahasiswa_cache[nama_mhs_lower] = baru_mhs
+        else:
+            mhs_db = mahasiswa_cache[nama_mhs_lower]
+            # Update nim jika sebelumnya None tapi sekarang ada di CSV
+            if nim_val and not mhs_db.nim:
+                mhs_db.nim = nim_val
         
         mhs_db = mahasiswa_cache[nama_mhs_lower]
 

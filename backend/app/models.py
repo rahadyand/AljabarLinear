@@ -7,7 +7,7 @@ Tabel:
   - nilai       : Relasi mahasiswa ↔ mata_kuliah beserta skor
 """
 
-from sqlalchemy import Integer, Float, String, ForeignKey
+from sqlalchemy import Integer, Float, String, ForeignKey, Column
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -21,7 +21,7 @@ class Mahasiswa(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     nama_mahasiswa: Mapped[str] = mapped_column(String(255), nullable=False)
-    nim: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    nim = Column(String, unique=True, index=True, nullable=True)
 
     # Relasi ke tabel nilai
     nilai_list: Mapped[list["Nilai"]] = relationship(

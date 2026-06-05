@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Nilai
@@ -21,3 +21,13 @@ def get_semua_nilai(db: Session = Depends(get_db)):
 @router.get("/{mahasiswa_id}", response_model=list[NilaiResponse])
 def get_nilai_mahasiswa(mahasiswa_id: int, db: Session = Depends(get_db)):
     return db.query(Nilai).filter(Nilai.mahasiswa_id == mahasiswa_id).all()
+
+@router.delete("/{nilai_id}")
+def delete_nilai(nilai_id: int, db: Session = Depends(get_db)):
+    db_nilai = db.query(Nilai).filter(Nilai.id == nilai_id).first()
+    if not db_nilai:
+        raise HTTPException(status_code=404, detail="Nilai tidak ditemukan")
+    
+    db.delete(db_nilai)
+    db.commit()
+    return {"message": "Data nilai berhasil dihapus"}
