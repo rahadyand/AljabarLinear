@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Gunakan env variable, fallback ke localhost untuk development
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: baseURL,
   headers: { 'Content-Type': 'application/json' },
 });
 

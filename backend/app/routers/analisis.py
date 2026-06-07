@@ -6,8 +6,17 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from app.database import get_db
 from app.models import Mahasiswa, MataKuliah, Nilai
+from typing import List, Dict, Any
+from collections import Counter
 
 router = APIRouter(prefix="/analisis", tags=["Analisis"])
+
+# Mapping nama klaster
+KLASTER_NAMES = {
+    0: "Praktisi Teknis",
+    1: "Analis/Pemikir Kritis",
+    2: "Perlu Bimbingan Ekstra"
+}
 
 @router.post("/pca")
 def hitung_pca(db: Session = Depends(get_db)):
@@ -95,9 +104,45 @@ def hitung_pca(db: Session = Depends(get_db)):
             "klaster": int(klaster_labels[i])
         })
 
+    # 7. Hitung Statistik Ringkasan K-Means Clustering
+    total_mahasiswa = len(skor_mahasiswa)
+    
+    # Hitung jumlah mahasiswa per klaster
+    klaster_counts = Counter(klaster_labels)
+    jumlah_per_klaster = {
+        KLASTER_NAMES[klaster_idx]: klaster_counts.get(klaster_idx, 0)
+        for klaster_idx in range(3)
+    }
+    
+    # Tentukan klaster dominan (paling banyak mahasiswa)
+    klaster_dominan_idx = klaster_labels.argmax() if len(klaster_labels) > 0 else 0
+    for klaster_idx in range(3):
+        if klaster_counts.get(klaster_idx, 0) > klaster_counts.get(klaster_dominan_idx, 0):
+            klaster_dominan_idx = klaster_idx
+    
+    klaster_dominan_nama = KLASTER_NAMES[klaster_dominan_idx]
+    jumlah_dominan = klaster_counts.get(klaster_dominan_idx, 0)
+    
+    # Tentukan klaster dengan jumlah terkecil untuk kalimat kesimpulan
+    jumlah_terkecil = min(jumlah_per_klaster.values())
+    klaster_terkecil = [k for k, v in jumlah_per_klaster.items() if v == jumlah_terkecil][0]
+    
+    # Buat pesan otomatis berdasarkan klaster dominan
+    pesan_otomatis = f"Dari total {total_mahasiswa} mahasiswa, mayoritas ({jumlah_dominan} orang) memiliki bakat sebagai {klaster_dominan_nama}, sementara {jumlah_terkecil} orang termasuk dalam kelompok {klaster_terkecil}."
+    
+    # Buat objek ringkasan
+    ringkasan = {
+        "total_mahasiswa": total_mahasiswa,
+        "jumlah_per_klaster": jumlah_per_klaster,
+        "klaster_dominan": klaster_dominan_nama,
+        "jumlah_klaster_dominan": jumlah_dominan,
+        "pesan_otomatis": pesan_otomatis
+    }
+
     return {
         "explained_variance_ratio": explained_variance_ratio,
         "komponen_utama": komponen_utama,
         "skor_mahasiswa": skor_mahasiswa,
-        "profil_klaster": profil_klaster
+        "profil_klaster": profil_klaster,
+        "ringkasan": ringkasan
     }

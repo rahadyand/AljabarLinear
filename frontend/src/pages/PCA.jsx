@@ -19,7 +19,52 @@ function round4(n) {
   return Math.round(n * 10000) / 10000;
 }
 
-// ── Sub-components ──────────────────────────────────────────
+// Insight Box component
+function InsightBox({ skor }) {
+  if (!skor || skor.length === 0) return null;
+  
+  // Count by cluster
+  const clusterCounts = [0, 0, 0];
+  skor.forEach((s) => {
+    const k = s.klaster ?? 0;
+    clusterCounts[k]++;
+  });
+  
+  const total = skor.length;
+  const percentages = clusterCounts.map((c) => Math.round((c / total) * 100));
+  
+  // Generate insight text
+  let insightText = `Dari ${total} mahasiswa yang dianalisis, `;
+  const clusterTexts = [];
+  
+  if (clusterCounts[1] > 0) {
+    clusterTexts.push(`${clusterCounts[1]} orang (${percentages[1]}%) memiliki bakat sebagai **Praktisi Teknis**`);
+  }
+  if (clusterCounts[2] > 0) {
+    clusterTexts.push(`${clusterCounts[2]} orang (${percentages[2]}%) sebagai **Analis/Pemikir Kritis**`);
+  }
+  if (clusterCounts[0] > 0) {
+    clusterTexts.push(`${clusterCounts[0]} orang (${percentages[0]}%) memerlukan **bimbingan akademik ekstra**`);
+  }
+  
+  insightText += clusterTexts.join(', ') + '.';
+  
+  return (
+    <div className="card border-0 shadow-sm rounded-3 mb-4" style={{ background: 'linear-gradient(135deg, rgba(79,70,229,0.08), rgba(37,99,235,0.08))' }}>
+      <div className="card-body p-4">
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+          <div style={{ fontSize: '2rem' }}>💡</div>
+          <div style={{ flex: 1 }}>
+            <h6 className="fw-semibold mb-2" style={{ color: '#1e293b' }}>Kesimpulan Analisis</h6>
+            <p style={{ fontSize: '0.95rem', color: '#475569', marginBottom: 0, lineHeight: '1.6' }}>
+              {insightText}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function VarianceChart({ ratios }) {
   const pct = ratios.map((r) => parseFloat((r * 100).toFixed(2)));
   const data = {
@@ -68,19 +113,39 @@ function VarianceChart({ ratios }) {
   return <Bar data={data} options={options} />;
 }
 
-// Cluster color palette
+// Cluster color palette & persona mapping
 const CLUSTER_COLORS = [
-  { bg: 'rgba(220,38,38,0.70)',  border: '#dc2626', label: 'Klaster 0' },
-  { bg: 'rgba(22,163,74,0.70)',  border: '#16a34a', label: 'Klaster 1' },
-  { bg: 'rgba(37,99,235,0.70)',  border: '#2563eb', label: 'Klaster 2' },
+  { bg: 'rgba(220,38,38,0.70)',  border: '#dc2626', label: 'Perlu Bimbingan Ekstra' },
+  { bg: 'rgba(22,163,74,0.70)',  border: '#16a34a', label: 'Praktisi Teknis' },
+  { bg: 'rgba(37,99,235,0.70)',  border: '#2563eb', label: 'Analis/Pemikir Kritis' },
 ];
+
+// Get persona from cluster
+function getPersona(klaster) {
+  const personas = [
+    'Perlu Bimbingan Ekstra',
+    'Praktisi Teknis',
+    'Analis/Pemikir Kritis'
+  ];
+  return personas[klaster] || 'Klaster ' + klaster;
+}
+
+// Get recommendation from cluster
+function getRecommendation(klaster) {
+  const recommendations = {
+    0: 'Memerlukan bimbingan akademik ekstra dan dukungan intensif dari dosen.',
+    1: 'Cocok diarahkan untuk proyek praktik, lab programming, atau asisten dosen di mata kuliah teknis.',
+    2: 'Cocok diarahkan untuk riset, asisten dosen, atau peran akademik yang memerlukan analisis mendalam.'
+  };
+  return recommendations[klaster] || 'Tidak ada rekomendasi.';
+}
 
 function ScatterChart({ skor }) {
   // Split points by cluster
   const byCluster = [[], [], []];
   skor.forEach((s) => {
     const k = s.klaster ?? 0;
-    byCluster[k]?.push({ x: s.PC1, y: s.PC2, label: s.nama_mahasiswa, nim: s.nim });
+    byCluster[k]?.push({ x: s.PC1, y: s.PC2, label: s.nama_mahasiswa, nim: s.nim, klaster: k });
   });
 
   const data = {
@@ -102,23 +167,32 @@ function ScatterChart({ skor }) {
         labels: { color: '#475569', font: { size: 12 }, padding: 16, usePointStyle: true },
       },
       tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 12,
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
         callbacks: {
+          title: () => `KTP Mahasiswa`,
           label: (ctx) => {
             const pt = ctx.raw;
-            const nimStr = pt.nim ? ` (${pt.nim})` : '';
-            return ` ${pt.label}${nimStr}  PC1=${round4(pt.x)}, PC2=${round4(pt.y)}`;
+            return [
+              `Nama: ${pt.label}`,
+              `Profil: ${getPersona(pt.klaster)}`,
+              `Rekomendasi: ${getRecommendation(pt.klaster)}`
+            ];
           },
+          afterLabel: () => '',
         },
       },
     },
     scales: {
       x: {
-        title: { display: true, text: 'PC1', color: '#64748b' },
+        title: { display: true, text: 'Dominasi Praktik & Coding ➡️', color: '#64748b', font: { size: 12, weight: 'bold' } },
         ticks: { color: '#94a3b8' },
         grid: { color: '#f1f5f9' },
       },
       y: {
-        title: { display: true, text: 'PC2', color: '#64748b' },
+        title: { display: true, text: 'Dominasi Teori & Analisis ⬆️', color: '#64748b', font: { size: 12, weight: 'bold' } },
         ticks: { color: '#94a3b8' },
         grid: { color: '#f1f5f9' },
       },
@@ -135,6 +209,7 @@ function KlasterBadge({ klaster }) {
     { bg: '#dbeafe', color: '#1d4ed8' },
   ];
   const s = styles[klaster] ?? styles[0];
+  const persona = getPersona(klaster);
   return (
     <span
       style={{
@@ -147,7 +222,7 @@ function KlasterBadge({ klaster }) {
         color: s.color,
       }}
     >
-      K{klaster}
+      {persona}
     </span>
   );
 }
@@ -158,9 +233,9 @@ function ProfilKlaster({ profil }) {
   const klasterKeys = Object.keys(profil).sort();
   const mkCols = Object.keys(profil[klasterKeys[0]] ?? {});
   const clusterStyle = [
-    { bg: '#fee2e2', color: '#b91c1c', label: 'Klaster 0' },
-    { bg: '#dcfce7', color: '#15803d', label: 'Klaster 1' },
-    { bg: '#dbeafe', color: '#1d4ed8', label: 'Klaster 2' },
+    { bg: '#fee2e2', color: '#b91c1c', label: 'Perlu Bimbingan Ekstra' },
+    { bg: '#dcfce7', color: '#15803d', label: 'Praktisi Teknis' },
+    { bg: '#dbeafe', color: '#1d4ed8', label: 'Analis/Pemikir Kritis' },
   ];
   return (
     <div className="card border-0 shadow-sm rounded-3 mt-4">
@@ -291,6 +366,9 @@ export default function PCA() {
       {/* Results */}
       {result && (
         <>
+          {/* Insight Box */}
+          <InsightBox skor={result.skor_mahasiswa} />
+          
           {/* Variance summary badges */}
           <div className="d-flex gap-3 mb-4 flex-wrap">
             {result.explained_variance_ratio.map((r, i) => (
