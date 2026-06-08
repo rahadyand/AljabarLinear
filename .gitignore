@@ -3,14 +3,3 @@ __pycache__/
 .env
 venv/
 env/
-
-# Database
-*.db
-backend/analisis_nilai.db
-
-# Test files
-test_upload.csv
-
-# Python cache
-__pycache__/
-*.pyc
