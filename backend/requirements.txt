@@ -3,3 +3,8 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 pandas==2.2.3
 scikit-learn==1.5.2
+<<<<<<< HEAD
+=======
+gunicorn==23.0.0
+python-multipart==0.0.9
+>>>>>>> phase-b-update

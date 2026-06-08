@@ -19,7 +19,56 @@ function round4(n) {
   return Math.round(n * 10000) / 10000;
 }
 
+<<<<<<< HEAD
 // ── Sub-components ──────────────────────────────────────────
+=======
+// Insight Box component
+function InsightBox({ skor }) {
+  if (!skor || skor.length === 0) return null;
+  
+  // Count by cluster
+  const clusterCounts = [0, 0, 0];
+  skor.forEach((s) => {
+    const k = s.klaster ?? 0;
+    clusterCounts[k]++;
+  });
+  
+  const total = skor.length;
+  const percentages = clusterCounts.map((c) => Math.round((c / total) * 100));
+  
+  // Generate insight text
+  let insightText = `Dari ${total} mahasiswa yang dianalisis, `;
+  const clusterTexts = [];
+  
+  if (clusterCounts[1] > 0) {
+    clusterTexts.push(`${clusterCounts[1]} orang (${percentages[1]}%) memiliki bakat sebagai **Praktisi Teknis**`);
+  }
+  if (clusterCounts[2] > 0) {
+    clusterTexts.push(`${clusterCounts[2]} orang (${percentages[2]}%) sebagai **Analis/Pemikir Kritis**`);
+  }
+  if (clusterCounts[0] > 0) {
+    clusterTexts.push(`${clusterCounts[0]} orang (${percentages[0]}%) memerlukan **bimbingan akademik ekstra**`);
+  }
+  
+  insightText += clusterTexts.join(', ') + '.';
+  
+  return (
+    <div className="card border-0 shadow-sm rounded-3 mb-4" style={{ background: 'linear-gradient(135deg, rgba(79,70,229,0.08), rgba(37,99,235,0.08))' }}>
+      <div className="card-body p-4">
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+          <div style={{ fontSize: '2rem' }}>💡</div>
+          <div style={{ flex: 1 }}>
+            <h6 className="fw-semibold mb-2" style={{ color: '#1e293b' }}>Kesimpulan Analisis</h6>
+            <p style={{ fontSize: '0.95rem', color: '#475569', marginBottom: 0, lineHeight: '1.6' }}>
+              {insightText}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+>>>>>>> phase-b-update
 function VarianceChart({ ratios }) {
   const pct = ratios.map((r) => parseFloat((r * 100).toFixed(2)));
   const data = {
@@ -68,6 +117,7 @@ function VarianceChart({ ratios }) {
   return <Bar data={data} options={options} />;
 }
 
+<<<<<<< HEAD
 function ScatterChart({ skor }) {
   const points = skor.map((s) => ({ x: s.PC1, y: s.PC2, label: s.nama_mahasiswa }));
   const data = {
@@ -81,10 +131,57 @@ function ScatterChart({ skor }) {
         pointHoverRadius: 9,
       },
     ],
+=======
+// Cluster color palette & persona mapping
+const CLUSTER_COLORS = [
+  { bg: 'rgba(220,38,38,0.70)',  border: '#dc2626', label: 'Perlu Bimbingan Ekstra' },
+  { bg: 'rgba(22,163,74,0.70)',  border: '#16a34a', label: 'Praktisi Teknis' },
+  { bg: 'rgba(37,99,235,0.70)',  border: '#2563eb', label: 'Analis/Pemikir Kritis' },
+];
+
+// Get persona from cluster
+function getPersona(klaster) {
+  const personas = [
+    'Perlu Bimbingan Ekstra',
+    'Praktisi Teknis',
+    'Analis/Pemikir Kritis'
+  ];
+  return personas[klaster] || 'Klaster ' + klaster;
+}
+
+// Get recommendation from cluster
+function getRecommendation(klaster) {
+  const recommendations = {
+    0: 'Memerlukan bimbingan akademik ekstra dan dukungan intensif dari dosen.',
+    1: 'Cocok diarahkan untuk proyek praktik, lab programming, atau asisten dosen di mata kuliah teknis.',
+    2: 'Cocok diarahkan untuk riset, asisten dosen, atau peran akademik yang memerlukan analisis mendalam.'
+  };
+  return recommendations[klaster] || 'Tidak ada rekomendasi.';
+}
+
+function ScatterChart({ skor }) {
+  // Split points by cluster
+  const byCluster = [[], [], []];
+  skor.forEach((s) => {
+    const k = s.klaster ?? 0;
+    byCluster[k]?.push({ x: s.PC1, y: s.PC2, label: s.nama_mahasiswa, nim: s.nim, klaster: k });
+  });
+
+  const data = {
+    datasets: CLUSTER_COLORS.map((c, i) => ({
+      label: c.label,
+      data: byCluster[i] ?? [],
+      backgroundColor: c.bg,
+      borderColor: c.border,
+      pointRadius: 6,
+      pointHoverRadius: 9,
+    })),
+>>>>>>> phase-b-update
   };
   const options = {
     responsive: true,
     plugins: {
+<<<<<<< HEAD
       legend: { display: false },
       tooltip: {
         callbacks: {
@@ -92,17 +189,48 @@ function ScatterChart({ skor }) {
             const pt = ctx.raw;
             return ` ${pt.label}  (${round4(pt.x)}, ${round4(pt.y)})`;
           },
+=======
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: { color: '#475569', font: { size: 12 }, padding: 16, usePointStyle: true },
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        padding: 12,
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
+        callbacks: {
+          title: () => `KTP Mahasiswa`,
+          label: (ctx) => {
+            const pt = ctx.raw;
+            return [
+              `Nama: ${pt.label}`,
+              `Profil: ${getPersona(pt.klaster)}`,
+              `Rekomendasi: ${getRecommendation(pt.klaster)}`
+            ];
+          },
+          afterLabel: () => '',
+>>>>>>> phase-b-update
         },
       },
     },
     scales: {
       x: {
+<<<<<<< HEAD
         title: { display: true, text: 'PC1', color: '#64748b' },
+=======
+        title: { display: true, text: 'Dominasi Praktik & Coding ➡️', color: '#64748b', font: { size: 12, weight: 'bold' } },
+>>>>>>> phase-b-update
         ticks: { color: '#94a3b8' },
         grid: { color: '#f1f5f9' },
       },
       y: {
+<<<<<<< HEAD
         title: { display: true, text: 'PC2', color: '#64748b' },
+=======
+        title: { display: true, text: 'Dominasi Teori & Analisis ⬆️', color: '#64748b', font: { size: 12, weight: 'bold' } },
+>>>>>>> phase-b-update
         ticks: { color: '#94a3b8' },
         grid: { color: '#f1f5f9' },
       },
@@ -111,6 +239,100 @@ function ScatterChart({ skor }) {
   return <Scatter data={data} options={options} />;
 }
 
+<<<<<<< HEAD
+=======
+// Cluster badge helper
+function KlasterBadge({ klaster }) {
+  const styles = [
+    { bg: '#fee2e2', color: '#b91c1c' },
+    { bg: '#dcfce7', color: '#15803d' },
+    { bg: '#dbeafe', color: '#1d4ed8' },
+  ];
+  const s = styles[klaster] ?? styles[0];
+  const persona = getPersona(klaster);
+  return (
+    <span
+      style={{
+        display: 'inline-block',
+        padding: '2px 10px',
+        borderRadius: 999,
+        fontSize: '0.78rem',
+        fontWeight: 600,
+        background: s.bg,
+        color: s.color,
+      }}
+    >
+      {persona}
+    </span>
+  );
+}
+
+// Profil Klaster table
+function ProfilKlaster({ profil }) {
+  if (!profil || Object.keys(profil).length === 0) return null;
+  const klasterKeys = Object.keys(profil).sort();
+  const mkCols = Object.keys(profil[klasterKeys[0]] ?? {});
+  const clusterStyle = [
+    { bg: '#fee2e2', color: '#b91c1c', label: 'Perlu Bimbingan Ekstra' },
+    { bg: '#dcfce7', color: '#15803d', label: 'Praktisi Teknis' },
+    { bg: '#dbeafe', color: '#1d4ed8', label: 'Analis/Pemikir Kritis' },
+  ];
+  return (
+    <div className="card border-0 shadow-sm rounded-3 mt-4">
+      <div className="card-body p-0">
+        <div className="px-4 py-3 border-bottom">
+          <h6 className="fw-semibold mb-0">Profil Klaster (Rata-rata Nilai per Mata Kuliah)</h6>
+        </div>
+        <div className="table-responsive">
+          <table className="table table-hover align-middle mb-0">
+            <thead className="table-light">
+              <tr>
+                <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>KLASTER</th>
+                {mkCols.map((mk) => (
+                  <th key={mk} className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>
+                    {mk.toUpperCase()}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {klasterKeys.map((k) => {
+                const idx = parseInt(k, 10);
+                const cs = clusterStyle[idx] ?? clusterStyle[0];
+                return (
+                  <tr key={k}>
+                    <td className="px-4">
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 12px',
+                          borderRadius: 999,
+                          fontSize: '0.78rem',
+                          fontWeight: 600,
+                          background: cs.bg,
+                          color: cs.color,
+                        }}
+                      >
+                        {cs.label}
+                      </span>
+                    </td>
+                    {mkCols.map((mk) => (
+                      <td key={mk} className="px-4 font-monospace" style={{ fontSize: '0.82rem' }}>
+                        {(profil[k][mk] ?? 0).toFixed(2)}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+>>>>>>> phase-b-update
 // ── Main Page ───────────────────────────────────────────────
 export default function PCA() {
   const [result, setResult] = useState(null);
@@ -185,6 +407,12 @@ export default function PCA() {
       {/* Results */}
       {result && (
         <>
+<<<<<<< HEAD
+=======
+          {/* Insight Box */}
+          <InsightBox skor={result.skor_mahasiswa} />
+          
+>>>>>>> phase-b-update
           {/* Variance summary badges */}
           <div className="d-flex gap-3 mb-4 flex-wrap">
             {result.explained_variance_ratio.map((r, i) => (
@@ -257,6 +485,11 @@ export default function PCA() {
                         <tr>
                           <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>#</th>
                           <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>NAMA MAHASISWA</th>
+<<<<<<< HEAD
+=======
+                          <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>NIM</th>
+                          <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>KLASTER</th>
+>>>>>>> phase-b-update
                           <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>PC1</th>
                           <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>PC2</th>
                         </tr>
@@ -266,6 +499,13 @@ export default function PCA() {
                           <tr key={s.mahasiswa_id}>
                             <td className="px-4 text-secondary" style={{ fontSize: '0.875rem' }}>{idx + 1}</td>
                             <td className="px-4 fw-medium" style={{ fontSize: '0.875rem' }}>{s.nama_mahasiswa}</td>
+<<<<<<< HEAD
+=======
+                            <td className="px-4 text-secondary" style={{ fontSize: '0.82rem' }}>
+                              {s.nim ?? <span className="fst-italic">—</span>}
+                            </td>
+                            <td className="px-4"><KlasterBadge klaster={s.klaster} /></td>
+>>>>>>> phase-b-update
                             <td className="px-4 font-monospace" style={{ fontSize: '0.82rem' }}>{round4(s.PC1)}</td>
                             <td className="px-4 font-monospace" style={{ fontSize: '0.82rem' }}>{round4(s.PC2)}</td>
                           </tr>
@@ -312,6 +552,12 @@ export default function PCA() {
               </div>
             </div>
           </div>
+<<<<<<< HEAD
+=======
+
+          {/* Profil Klaster */}
+          <ProfilKlaster profil={result.profil_klaster} />
+>>>>>>> phase-b-update
         </>
       )}
 

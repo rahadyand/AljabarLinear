@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { getMahasiswa, createMahasiswa } from '../services/mahasiswaApi';
+=======
+import { getMahasiswa, createMahasiswa, deleteMahasiswa } from '../services/mahasiswaApi';
+>>>>>>> phase-b-update
 
 export default function Mahasiswa() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [nama, setNama] = useState('');
+<<<<<<< HEAD
+=======
+  const [nim, setNim] = useState('');
+>>>>>>> phase-b-update
   const [alert, setAlert] = useState(null); // { type: 'success'|'danger', msg }
 
   const fetchData = async () => {
@@ -29,8 +37,16 @@ export default function Mahasiswa() {
     setSubmitting(true);
     setAlert(null);
     try {
+<<<<<<< HEAD
       await createMahasiswa({ nama_mahasiswa: trimmed });
       setNama('');
+=======
+      const payload = { nama_mahasiswa: trimmed };
+      if (nim.trim()) payload.nim = nim.trim();
+      await createMahasiswa(payload);
+      setNama('');
+      setNim('');
+>>>>>>> phase-b-update
       setAlert({ type: 'success', msg: `Mahasiswa "${trimmed}" berhasil ditambahkan.` });
       await fetchData();
     } catch (err) {
@@ -41,6 +57,22 @@ export default function Mahasiswa() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleDelete = async (id, nama) => {
+    if (!window.confirm(`Hapus mahasiswa "${nama}" beserta semua nilainya?`)) return;
+    setAlert(null);
+    try {
+      const res = await deleteMahasiswa(id);
+      setAlert({ type: 'success', msg: res.data.message });
+      await fetchData();
+    } catch (err) {
+      const detail = err.response?.data?.detail || 'Gagal menghapus mahasiswa.';
+      setAlert({ type: 'danger', msg: detail });
+    }
+  };
+
+>>>>>>> phase-b-update
   return (
     <div>
       <div className="page-header">
@@ -63,8 +95,13 @@ export default function Mahasiswa() {
               />
             </div>
           )}
+<<<<<<< HEAD
           <form onSubmit={handleSubmit} className="d-flex gap-2 align-items-end">
             <div className="flex-grow-1">
+=======
+          <form onSubmit={handleSubmit} className="d-flex gap-2 align-items-end flex-wrap">
+            <div className="flex-grow-1" style={{ minWidth: 180 }}>
+>>>>>>> phase-b-update
               <label htmlFor="nama_mahasiswa" className="form-label form-label-sm text-secondary mb-1">
                 Nama Mahasiswa
               </label>
@@ -79,6 +116,23 @@ export default function Mahasiswa() {
                 disabled={submitting}
               />
             </div>
+<<<<<<< HEAD
+=======
+            <div style={{ minWidth: 140 }}>
+              <label htmlFor="nim_input" className="form-label form-label-sm text-secondary mb-1">
+                NIM <span className="text-muted" style={{ fontSize: '0.75rem' }}>(opsional)</span>
+              </label>
+              <input
+                id="nim_input"
+                type="text"
+                className="form-control"
+                placeholder="Contoh: 2024001"
+                value={nim}
+                onChange={(e) => setNim(e.target.value)}
+                disabled={submitting}
+              />
+            </div>
+>>>>>>> phase-b-update
             <button
               type="submit"
               className="btn btn-primary px-4"
@@ -120,7 +174,13 @@ export default function Mahasiswa() {
                   <tr>
                     <th style={{ width: 60 }} className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>#</th>
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>ID</th>
+<<<<<<< HEAD
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>NAMA MAHASISWA</th>
+=======
+                    <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>NIM</th>
+                    <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>NAMA MAHASISWA</th>
+                    <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem', width: 80 }}>AKSI</th>
+>>>>>>> phase-b-update
                   </tr>
                 </thead>
                 <tbody>
@@ -132,9 +192,27 @@ export default function Mahasiswa() {
                           {m.id}
                         </span>
                       </td>
+<<<<<<< HEAD
                       <td className="px-4 fw-medium" style={{ fontSize: '0.875rem' }}>
                         {m.nama_mahasiswa}
                       </td>
+=======
+                      <td className="px-4 text-secondary" style={{ fontSize: '0.82rem' }}>
+                        {m.nim ?? <span className="fst-italic text-muted">—</span>}
+                      </td>
+                      <td className="px-4 fw-medium" style={{ fontSize: '0.875rem' }}>
+                        {m.nama_mahasiswa}
+                      </td>
+                      <td className="px-4">
+                        <button
+                          className="btn btn-outline-danger btn-sm"
+                          style={{ fontSize: '0.75rem', padding: '2px 10px' }}
+                          onClick={() => handleDelete(m.id, m.nama_mahasiswa)}
+                        >
+                          Hapus
+                        </button>
+                      </td>
+>>>>>>> phase-b-update
                     </tr>
                   ))}
                 </tbody>

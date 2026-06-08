@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd backend && pip install -r requirements.txt",
+  "outputDirectory": "backend",
+  "framework": "fastapi",
+  "env": {
+    "DATABASE_URL": "@database_url"
+  },
+  "regions": ["sin1"],
+  "functions": {
+    "backend/app/main.py": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}

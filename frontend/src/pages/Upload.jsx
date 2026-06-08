@@ -196,12 +196,19 @@ export default function Upload() {
             <div className="card-body p-4">
               <h6 className="fw-semibold mb-3">📋 Format CSV</h6>
               <p className="text-secondary" style={{ fontSize: '0.875rem' }}>
+<<<<<<< HEAD
                 File CSV harus memiliki kolom pertama <code>Nama Mahasiswa</code>,
                 diikuti satu kolom per mata kuliah. Separator bisa koma (<code>,</code>) atau
+=======
+                Kolom pertama wajib <code>Nama Mahasiswa</code>. Kolom <code>NIM</code> bersifat
+                opsional dan dapat diletakkan di kolom kedua. Kolom-kolom selanjutnya
+                adalah nama mata kuliah. Separator bisa koma (<code>,</code>) atau
+>>>>>>> phase-b-update
                 titik koma (<code>;</code>).
               </p>
 
               <div
+<<<<<<< HEAD
                 className="rounded-2 p-3 mb-3"
                 style={{ background: '#1e1b4b', fontFamily: 'monospace', fontSize: '0.78rem', color: '#c7d2fe', lineHeight: 1.7 }}
               >
@@ -210,11 +217,35 @@ export default function Upload() {
                 <div>Budi Santoso,85,78,90</div>
                 <div>Siti Rahayu,92,88,75</div>
                 <div>Ahmad Fauzi,70,65,80</div>
+=======
+                className="rounded-2 p-3 mb-2"
+                style={{ background: '#1e1b4b', fontFamily: 'monospace', fontSize: '0.78rem', color: '#c7d2fe', lineHeight: 1.7 }}
+              >
+                <div style={{ color: '#818cf8' }}># Tanpa NIM</div>
+                <div>Nama Mahasiswa,Kalkulus,Fisika,Aljabar Linear</div>
+                <div>Budi Santoso,85,78,90</div>
+                <div>Siti Rahayu,92,88,75</div>
+              </div>
+
+              <div
+                className="rounded-2 p-3 mb-3"
+                style={{ background: '#1e1b4b', fontFamily: 'monospace', fontSize: '0.78rem', color: '#c7d2fe', lineHeight: 1.7 }}
+              >
+                <div style={{ color: '#818cf8' }}># Dengan NIM (opsional)</div>
+                <div>Nama Mahasiswa,NIM,Kalkulus,Fisika,Aljabar Linear</div>
+                <div>Budi Santoso,2024001,85,78,90</div>
+                <div>Siti Rahayu,2024002,92,88,75</div>
+                <div>Ahmad Fauzi,,70,65,80</div>
+>>>>>>> phase-b-update
               </div>
 
               <ul className="mb-0 ps-3" style={{ fontSize: '0.82rem', color: '#475569', lineHeight: 2 }}>
                 <li>Baris pertama wajib berisi nama kolom</li>
                 <li>Kolom <code>Nama Mahasiswa</code> wajib ada (case-insensitive)</li>
+<<<<<<< HEAD
+=======
+                <li>Kolom <code>NIM</code> bersifat opsional — jika ada, nilai boleh dikosongkan per baris</li>
+>>>>>>> phase-b-update
                 <li>Nama mahasiswa yang sudah ada <strong>tidak</strong> akan digandakan</li>
                 <li>Skor yang sudah ada akan <strong>diperbarui</strong></li>
                 <li>Nilai kosong (NaN) pada suatu sel akan dilewati</li>

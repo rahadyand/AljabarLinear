@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { getNilai, createNilai } from '../services/nilaiApi';
+=======
+import { getNilai, getNilaiByMahasiswa, createNilai, deleteNilai } from '../services/nilaiApi';
+>>>>>>> phase-b-update
 import { getMahasiswa } from '../services/mahasiswaApi';
 import { getMataKuliah } from '../services/mataKuliahApi';
 
@@ -17,9 +21,23 @@ export default function Nilai() {
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
 
+<<<<<<< HEAD
   // Form state
   const [form, setForm] = useState({ mahasiswa_id: '', mata_kuliah_id: '', skor: '' });
 
+=======
+  // Filter state
+  const [filterMhsId, setFilterMhsId] = useState('');
+
+  // Form state
+  const [form, setForm] = useState({ mahasiswa_id: '', mata_kuliah_id: '', skor: '' });
+
+  const fetchNilai = async (mhsId) => {
+    const res = mhsId ? await getNilaiByMahasiswa(mhsId) : await getNilai();
+    setNilaiList(res.data);
+  };
+
+>>>>>>> phase-b-update
   const fetchAll = async () => {
     try {
       const [nilaiRes, mhsRes, mkRes] = await Promise.all([
@@ -47,6 +65,14 @@ export default function Nilai() {
 
   useEffect(() => { fetchAll(); }, []);
 
+<<<<<<< HEAD
+=======
+  // Re-fetch nilai when filter changes (after initial load)
+  useEffect(() => {
+    if (!loading) fetchNilai(filterMhsId);
+  }, [filterMhsId]);
+
+>>>>>>> phase-b-update
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -78,7 +104,11 @@ export default function Nilai() {
       });
 
       setForm({ mahasiswa_id: '', mata_kuliah_id: '', skor: '' });
+<<<<<<< HEAD
       await fetchAll();
+=======
+      await fetchNilai(filterMhsId);
+>>>>>>> phase-b-update
     } catch (err) {
       const detail = err.response?.data?.detail || 'Gagal menambahkan nilai.';
       setAlert({ type: 'danger', msg: detail });
@@ -87,6 +117,22 @@ export default function Nilai() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleDelete = async (id) => {
+    if (!window.confirm('Hapus entri nilai ini?')) return;
+    setAlert(null);
+    try {
+      const res = await deleteNilai(id);
+      setAlert({ type: 'success', msg: res.data.message });
+      await fetchNilai(filterMhsId);
+    } catch (err) {
+      const detail = err.response?.data?.detail || 'Gagal menghapus nilai.';
+      setAlert({ type: 'danger', msg: detail });
+    }
+  };
+
+>>>>>>> phase-b-update
   return (
     <div>
       <div className="page-header">
@@ -202,11 +248,33 @@ export default function Nilai() {
       {/* Data Table */}
       <div className="card border-0 shadow-sm rounded-3">
         <div className="card-body p-0">
+<<<<<<< HEAD
           <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom">
             <h6 className="fw-semibold mb-0">Daftar Nilai</h6>
             <span className="badge bg-warning bg-opacity-10 text-warning fw-semibold">
               {nilaiList.length} entri
             </span>
+=======
+          <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom flex-wrap gap-2">
+            <h6 className="fw-semibold mb-0">Daftar Nilai</h6>
+            <div className="d-flex align-items-center gap-3 flex-wrap">
+              <select
+                id="filter_mahasiswa"
+                className="form-select form-select-sm"
+                style={{ width: 'auto', minWidth: 180 }}
+                value={filterMhsId}
+                onChange={(e) => setFilterMhsId(e.target.value)}
+              >
+                <option value="">Semua Mahasiswa</option>
+                {mahasiswaList.map((m) => (
+                  <option key={m.id} value={m.id}>{m.nama_mahasiswa}</option>
+                ))}
+              </select>
+              <span className="badge bg-warning bg-opacity-10 text-warning fw-semibold">
+                {nilaiList.length} entri
+              </span>
+            </div>
+>>>>>>> phase-b-update
           </div>
 
           {loading ? (
@@ -227,6 +295,10 @@ export default function Nilai() {
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>MAHASISWA</th>
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>MATA KULIAH</th>
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem', width: 100 }}>SKOR</th>
+<<<<<<< HEAD
+=======
+                    <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem', width: 80 }}>AKSI</th>
+>>>>>>> phase-b-update
                   </tr>
                 </thead>
                 <tbody>
@@ -257,6 +329,18 @@ export default function Nilai() {
                           {n.skor}
                         </span>
                       </td>
+<<<<<<< HEAD
+=======
+                      <td className="px-4">
+                        <button
+                          className="btn btn-outline-danger btn-sm"
+                          style={{ fontSize: '0.75rem', padding: '2px 10px' }}
+                          onClick={() => handleDelete(n.id)}
+                        >
+                          Hapus
+                        </button>
+                      </td>
+>>>>>>> phase-b-update
                     </tr>
                   ))}
                 </tbody>

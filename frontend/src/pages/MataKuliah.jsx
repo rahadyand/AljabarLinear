@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { getMataKuliah, createMataKuliah } from '../services/mataKuliahApi';
+=======
+import { getMataKuliah, createMataKuliah, deleteMataKuliah } from '../services/mataKuliahApi';
+>>>>>>> phase-b-update
 
 export default function MataKuliah() {
   const [list, setList] = useState([]);
@@ -41,6 +45,22 @@ export default function MataKuliah() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleDelete = async (id, nama) => {
+    if (!window.confirm(`Hapus mata kuliah "${nama}" beserta semua nilainya?`)) return;
+    setAlert(null);
+    try {
+      const res = await deleteMataKuliah(id);
+      setAlert({ type: 'success', msg: res.data.message });
+      await fetchData();
+    } catch (err) {
+      const detail = err.response?.data?.detail || 'Gagal menghapus mata kuliah.';
+      setAlert({ type: 'danger', msg: detail });
+    }
+  };
+
+>>>>>>> phase-b-update
   return (
     <div>
       <div className="page-header">
@@ -121,6 +141,10 @@ export default function MataKuliah() {
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem', width: 60 }}>#</th>
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem', width: 80 }}>ID</th>
                     <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem' }}>NAMA MATA KULIAH</th>
+<<<<<<< HEAD
+=======
+                    <th className="px-4 py-3 text-secondary fw-semibold" style={{ fontSize: '0.78rem', width: 80 }}>AKSI</th>
+>>>>>>> phase-b-update
                   </tr>
                 </thead>
                 <tbody>
@@ -135,6 +159,18 @@ export default function MataKuliah() {
                       <td className="px-4 fw-medium" style={{ fontSize: '0.875rem' }}>
                         {mk.nama_mk}
                       </td>
+<<<<<<< HEAD
+=======
+                      <td className="px-4">
+                        <button
+                          className="btn btn-outline-danger btn-sm"
+                          style={{ fontSize: '0.75rem', padding: '2px 10px' }}
+                          onClick={() => handleDelete(mk.id, mk.nama_mk)}
+                        >
+                          Hapus
+                        </button>
+                      </td>
+>>>>>>> phase-b-update
                     </tr>
                   ))}
                 </tbody>
